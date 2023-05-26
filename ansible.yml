@@ -1,0 +1,51 @@
+- name: Configure Apache2 virtual hosts
+  hosts: your_server
+  become: true
+  vars:
+    apache_port: 80
+
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Enable Apache2 Rewrite module
+      command: a2enmod rewrite
+
+    - name: Create directories for virtual hosts
+      file:
+        path: "/var/www/{{ item }}"
+        state: directory
+        mode: '0755'
+      with_items:
+        - www.hei.school
+        - api.hei.school
+        - front.hei.school
+        - back.hei.school
+
+    - name: Configure virtual hosts
+      template:
+        src: virtualhost.conf.j2
+        dest: "/etc/apache2/sites-available/{{ item }}"
+      with_items:
+        - www.hei.school.conf
+        - api.hei.school.conf
+        - front.hei.school.conf
+        - back.hei.school.conf
+      notify: Restart Apache2
+
+    - name: Enable virtual hosts
+      command: a2ensite "{{ item }}"
+      with_items:
+        - www.hei.school.conf
+        - api.hei.school.conf
+        - front.hei.school.conf
+        - back.hei.school.conf
+      notify: Restart Apache2
+
+  handlers:
+    - name: Restart Apache2
+      service:
+        name: apache2
+        state: restarted

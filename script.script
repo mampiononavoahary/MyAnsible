@@ -1,0 +1,14 @@
+<VirtualHost *:80>
+    ServerName www.hei.school
+    ServerAlias hei.school
+
+    DocumentRoot /var/www/hei.school
+
+    <Directory /var/www/hei.school>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/hei.school_error.log
+    CustomLog ${APACHE_LOG_DIR}/hei.school_access.log combined
+</VirtualHost>
